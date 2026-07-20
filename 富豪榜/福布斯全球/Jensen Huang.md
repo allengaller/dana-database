@@ -21,6 +21,7 @@ first_appeared: 2001
 date: 2026-06-29
 related:
   - [[富豪榜主索引]]
+  - [[Jensen Huang]]
   - [[Elon Musk]]
   - [[Jeff Bezos]]
   - [[富豪榜共性心法]]
