@@ -18,7 +18,7 @@ company: Binance（币安）
 peak_rank: 24
 peak_net_worth: 1077 亿美元（2026 Forbes 峰值）/ 福布斯 2025 #24 629 亿
 first_appeared: 2018
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Elon Musk]]

@@ -16,7 +16,7 @@ company: Schwarz Gruppe（Lidl / Kaufland）
 peak_rank: 20
 peak_net_worth: 470 亿美元（2024 峰值）
 first_appeared: 2000s
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Karl Albrecht]]

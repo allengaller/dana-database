@@ -1,0 +1,642 @@
+---
+layout: null
+title: 大拿能力图谱
+---
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dana · 大拿能力图谱</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --panel-bg: #ffffff;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2c5282;
+      --accent-bg: #dbeafe;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --panel-bg: #1e293b;
+        --text: #e2e8f0;
+        --text-muted: #94a3b8;
+        --border: #334155;
+        --accent: #60a5fa;
+        --accent-bg: #1e3a8a;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    .header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel-bg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    h1 { font-size: 1.4rem; font-weight: 600; }
+    h1 a { color: var(--text-muted); text-decoration: none; }
+    h1 a:hover { color: var(--text); }
+    .header-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: calc(100vh - 70px);
+    }
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+    .sidebar {
+      background: var(--panel-bg);
+      border-right: 1px solid var(--border);
+      padding: 1.25rem;
+      overflow-y: auto;
+    }
+    .sidebar h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .filter-group {
+      margin-bottom: 1.25rem;
+    }
+    .filter-group h3 {
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .filter-chip {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.65rem;
+      margin: 0.15rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--panel-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .filter-chip:hover { border-color: var(--accent); }
+    .filter-chip.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .search-box {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .search-box:focus { outline: none; border-color: var(--accent); }
+    .stats {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .canvas-area {
+      position: relative;
+      background: var(--bg);
+    }
+    #graph {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    #graph:active { cursor: grabbing; }
+    .node {
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .node circle {
+      stroke: var(--panel-bg);
+      stroke-width: 2px;
+    }
+    .node text {
+      font-size: 11px;
+      fill: var(--text);
+      pointer-events: none;
+      text-anchor: middle;
+      font-weight: 500;
+    }
+    .link {
+      stroke: var(--border);
+      stroke-opacity: 0.6;
+    }
+    .link.active { stroke: var(--accent); stroke-opacity: 0.8; }
+    .tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      max-width: 280px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+    .tooltip h4 {
+      font-size: 0.95rem;
+      margin-bottom: 0.35rem;
+      color: var(--accent);
+    }
+    .tooltip p { color: var(--text-muted); font-size: 0.8rem; }
+    .legend {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.78rem;
+      max-width: 220px;
+    }
+    .legend-title {
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.7rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.2rem 0;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .export-bar {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+    }
+    .export-btn {
+      font-size: 0.78rem;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .export-btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .export-btn:active { transform: scale(0.98); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1><a href="{{ '/' | relative_url }}">&larr; dana</a> · 大拿能力图谱</h1>
+    <div class="header-meta">交互式可视化 · 基于人物 frontmatter 标签</div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <input type="text" class="search-box" id="search-box" placeholder="搜索人物…">
+
+      <div class="filter-group">
+        <h3>类型</h3>
+        <div id="type-filters"></div>
+      </div>
+
+      <div class="filter-group">
+        <h3>影响力维度</h3>
+        <div id="dimension-filters"></div>
+      </div>
+
+      <div class="filter-group">
+        <h3>职业阶段</h3>
+        <div id="stage-filters"></div>
+      </div>
+
+      <div class="stats" id="stats"></div>
+    </aside>
+
+    <div class="canvas-area">
+      <svg id="graph" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="tooltip" id="tooltip"></div>
+      <div class="export-bar">
+        <button class="export-btn" id="export-svg" title="导出为 SVG（可在 Figma/Illustrator 编辑）">📥 导出 SVG</button>
+        <button class="export-btn" id="export-png" title="导出为 PNG（适合社交分享）">🖼 导出 PNG</button>
+      </div>
+      <div class="legend">
+        <div class="legend-title">能力类型</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>AI 时代关键人物</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>中国大拿</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span>全球经典</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ec4899"></span>超级个体</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>教育与社区</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#94a3b8"></span>能力维度</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tooltip = document.getElementById('tooltip');
+    const searchBox = document.getElementById('search-box');
+    const statsDiv = document.getElementById('stats');
+
+    // 颜色映射
+    const TYPE_COLOR = {
+      '人物/AI时代': '#3b82f6',
+      '人物/中国': '#f59e0b',
+      '人物/全球': '#10b981',
+      '人物/超级个体': '#ec4899',
+      '人物/教育与社区型': '#8b5cf6',
+    };
+    const DIM_COLOR = '#94a3b8';
+
+    let allNodes = [];
+    let allLinks = [];
+    let activeTypes = new Set();
+    let activeDimensions = new Set();
+    let activeStages = new Set();
+    let searchTerm = '';
+
+    fetch('{{ "/search.json" | relative_url }}')
+      .then(r => r.json())
+      .then(pages => {
+        const personPages = pages.filter(p =>
+          p.section === '人物志' && p.url && p.tags && p.tags.length > 0
+        );
+
+        const dimensions = new Map();  // 维度 -> { count, type }
+        const stages = new Map();
+
+        personPages.forEach(p => {
+          // 节点
+          const tags = p.tags || [];
+          const mainType = tags.find(t => t.startsWith('人物/')) || '人物/其他';
+          const personDim = tags.filter(t => t.startsWith('影响力/'));
+          const personStage = tags.filter(t => t.startsWith('阶段/'));
+
+          allNodes.push({
+            id: p.url,
+            title: p.title,
+            type: mainType,
+            tags: tags,
+            radius: 6 + Math.min(personDim.length, 4) * 1.5
+          });
+
+          // 维度节点 + 边
+          personDim.forEach(dim => {
+            if (!dimensions.has(dim)) dimensions.set(dim, { count: 0, type: 'dimension' });
+            dimensions.get(dim).count++;
+            allLinks.push({ source: p.url, target: dim, type: 'dimension' });
+          });
+
+          // 阶段节点 + 边
+          personStage.forEach(stage => {
+            if (!stages.has(stage)) stages.set(stage, { count: 0, type: 'stage' });
+            stages.get(stage).count++;
+            allLinks.push({ source: p.url, target: stage, type: 'stage' });
+          });
+        });
+
+        // 添加维度/阶段节点
+        dimensions.forEach((info, dim) => {
+          allNodes.push({
+            id: dim,
+            title: dim.replace('影响力/', ''),
+            type: 'dimension',
+            tags: [],
+            radius: 8 + Math.log2(info.count) * 3
+          });
+        });
+        stages.forEach((info, stage) => {
+          allNodes.push({
+            id: stage,
+            title: stage.replace('阶段/', ''),
+            type: 'stage',
+            tags: [],
+            radius: 8 + Math.log2(info.count) * 3
+          });
+        });
+
+        // 渲染过滤按钮
+        renderFilter('type-filters', new Set(personPages.map(p => p.tags.find(t => t.startsWith('人物/'))).filter(Boolean)), 'type');
+        renderFilter('dimension-filters', dimensions, 'dimension');
+        renderFilter('stage-filters', stages, 'stage');
+
+        statsDiv.textContent = `📊 ${personPages.length} 位人物 · ${dimensions.size} 个能力维度 · ${stages.size} 个职业阶段`;
+
+        drawGraph();
+      })
+      .catch(err => {
+        document.querySelector('.canvas-area').innerHTML =
+          '<p style="padding:2rem;color:var(--text-muted)">⚠️ 索引加载失败：' + err.message + '</p>';
+      });
+
+    function renderFilter(containerId, items, filterKind) {
+      const container = document.getElementById(containerId);
+      items.forEach((info, key) => {
+        const chip = document.createElement('span');
+        chip.className = 'filter-chip';
+        const label = key.replace(/^(人物\/|影响力\/|阶段\/)/, '');
+        const count = (info && info.count) || '';
+        chip.textContent = count ? `${label} (${count})` : label;
+        chip.addEventListener('click', () => {
+          chip.classList.toggle('active');
+          if (filterKind === 'type') {
+            if (activeTypes.has(key)) activeTypes.delete(key);
+            else activeTypes.add(key);
+          } else if (filterKind === 'dimension') {
+            if (activeDimensions.has(key)) activeDimensions.delete(key);
+            else activeDimensions.add(key);
+          } else if (filterKind === 'stage') {
+            if (activeStages.has(key)) activeStages.delete(key);
+            else activeStages.add(key);
+          }
+          updateGraph();
+        });
+        container.appendChild(chip);
+      });
+    }
+
+    function matchesFilters(node) {
+      if (node.type === 'dimension' || node.type === 'stage') {
+        if (activeDimensions.has(node.id) || activeStages.has(node.id)) return true;
+        if (activeTypes.size > 0 && (activeDimensions.size === 0 && activeStages.size === 0)) return false;
+        return true;
+      }
+      if (searchTerm && !node.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+      if (activeTypes.size > 0) {
+        const personType = (node.tags || []).find(t => t.startsWith('人物/'));
+        if (!activeTypes.has(personType)) return false;
+      }
+      if (activeDimensions.size > 0) {
+        const hasDim = (node.tags || []).some(t => activeDimensions.has(t));
+        if (!hasDim) return false;
+      }
+      if (activeStages.size > 0) {
+        const hasStage = (node.tags || []).some(t => activeStages.has(t));
+        if (!hasStage) return false;
+      }
+      return true;
+    }
+
+    function nodeColor(node) {
+      if (node.type === 'dimension') return DIM_COLOR;
+      return TYPE_COLOR[node.type] || '#6b7280';
+    }
+
+    let simulation, svg, linkSel, nodeSel;
+
+    function drawGraph() {
+      const width = document.querySelector('.canvas-area').clientWidth;
+      const height = document.querySelector('.canvas-area').clientHeight;
+
+      svg = d3.select('#graph')
+        .attr('width', width)
+        .attr('height', height);
+
+      svg.selectAll('*').remove();
+
+      const g = svg.append('g');
+
+      // zoom & pan
+      svg.call(d3.zoom().scaleExtent([0.3, 3]).on('zoom', (e) => {
+        g.attr('transform', e.transform);
+      }));
+
+      linkSel = g.append('g').attr('class', 'links').selectAll('line');
+      nodeSel = g.append('g').attr('class', 'nodes').selectAll('g');
+
+      simulation = d3.forceSimulation(allNodes)
+        .force('link', d3.forceLink(allLinks).id(d => d.id).distance(d => d.type === 'dimension' ? 80 : 60).strength(0.3))
+        .force('charge', d3.forceManyBody().strength(-150))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('collision', d3.forceCollide().radius(d => d.radius + 4))
+        .on('tick', ticked);
+
+      function ticked() {
+        linkSel
+          .attr('x1', d => d.source.x)
+          .attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x)
+          .attr('y2', d => d.target.y);
+        nodeSel
+          .attr('transform', d => `translate(${d.x},${d.y})`);
+      }
+
+      updateGraph();
+    }
+
+    function updateGraph() {
+      const filteredNodes = allNodes.filter(matchesFilters);
+      const filteredIds = new Set(filteredNodes.map(n => n.id));
+      const filteredLinks = allLinks.filter(l => filteredIds.has(l.source.id || l.source) && filteredIds.has(l.target.id || l.target));
+
+      linkSel = linkSel
+        .data(filteredLinks, d => `${(d.source.id || d.source)}-${(d.target.id || d.target)}`)
+        .join('line')
+        .attr('class', 'link')
+        .attr('stroke-width', 1);
+
+      nodeSel = nodeSel
+        .data(filteredNodes, d => d.id)
+        .join(enter => {
+          const g = enter.append('g').attr('class', 'node');
+          g.append('circle');
+          g.append('text').attr('dy', '0.3em');
+          return g;
+        });
+
+      nodeSel.select('circle')
+        .attr('r', d => d.radius)
+        .attr('fill', d => nodeColor(d));
+
+      nodeSel.select('text')
+        .text(d => d.title.length > 12 ? d.title.substring(0, 11) + '…' : d.title);
+
+      nodeSel
+        .on('mouseover', (event, d) => {
+          tooltip.style.opacity = 1;
+          tooltip.innerHTML = `<h4>${d.title}</h4><p>${d.tags ? d.tags.join(' · ') : ''}</p>`;
+          if (d.type && !d.type.startsWith('人物/')) {
+            // 维度/阶段：显示关联人物
+            const connected = allLinks.filter(l => (l.target.id || l.target) === d.id)
+              .map(l => allNodes.find(n => n.id === (l.source.id || l.source))?.title)
+              .filter(Boolean).slice(0, 8);
+            if (connected.length) {
+              tooltip.innerHTML += `<p style="margin-top:0.4rem">关联人物：${connected.join('、')}</p>`;
+            }
+          }
+        })
+        .on('mousemove', (event) => {
+          const rect = document.querySelector('.canvas-area').getBoundingClientRect();
+          tooltip.style.left = (event.clientX - rect.left + 12) + 'px';
+          tooltip.style.top = (event.clientY - rect.top + 12) + 'px';
+        })
+        .on('mouseout', () => {
+          tooltip.style.opacity = 0;
+        })
+        .on('click', (event, d) => {
+          if (d.url && d.type.startsWith('人物/')) {
+            window.location.href = d.url;
+          }
+        });
+
+      simulation.nodes(filteredNodes);
+      simulation.force('link').links(filteredLinks);
+      simulation.alpha(0.6).restart();
+    }
+
+    searchBox.addEventListener('input', () => {
+      searchTerm = searchBox.value.trim();
+      updateGraph();
+    });
+
+    window.addEventListener('resize', () => {
+      if (simulation) {
+        const width = document.querySelector('.canvas-area').clientWidth;
+        const height = document.querySelector('.canvas-area').clientHeight;
+        svg.attr('width', width).attr('height', height);
+        simulation.force('center', d3.forceCenter(width / 2, height / 2));
+        simulation.alpha(0.3).restart();
+      }
+    });
+
+    // SVG 导出函数
+    function exportSVG() {
+      const svgEl = document.getElementById('graph');
+      const clone = svgEl.cloneNode(true);
+      const width = svgEl.clientWidth;
+      const height = svgEl.clientHeight;
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('width', width);
+      clone.setAttribute('height', height);
+      clone.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+      // 注入 inline style（确保 dark mode 也能正常导出）
+      const styleEl = document.createElement('style');
+      styleEl.textContent = `
+        .node circle { stroke: #ffffff; stroke-width: 2px; }
+        .node text { font-size: 11px; fill: #1f2937; font-family: -apple-system, sans-serif; font-weight: 500; }
+        .link { stroke: #cbd5e1; stroke-opacity: 0.6; }
+      `;
+      clone.insertBefore(styleEl, clone.firstChild);
+
+      const serializer = new XMLSerializer();
+      const svgString = '<?xml version="1.0" encoding="UTF-8"?>\n' + serializer.serializeToString(clone);
+      const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const today = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `dana-skill-map-${today}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    // PNG 导出函数
+    function exportPNG() {
+      const svgEl = document.getElementById('graph');
+      const width = svgEl.clientWidth;
+      const height = svgEl.clientHeight;
+      const clone = svgEl.cloneNode(true);
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('width', width);
+      clone.setAttribute('height', height);
+      const styleEl = document.createElement('style');
+      styleEl.textContent = `
+        .node circle { stroke: #ffffff; stroke-width: 2px; }
+        .node text { font-size: 11px; fill: #1f2937; font-family: -apple-system, sans-serif; font-weight: 500; }
+        .link { stroke: #cbd5e1; stroke-opacity: 0.6; }
+      `;
+      clone.insertBefore(styleEl, clone.firstChild);
+
+      const svgString = new XMLSerializer().serializeToString(clone);
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        // 2x 分辨率
+        canvas.width = width * 2;
+        canvas.height = height * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.scale(2, 2);
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(function(blob) {
+          const pngUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          const today = new Date().toISOString().slice(0, 10);
+          link.href = pngUrl;
+          link.download = `dana-skill-map-${today}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(pngUrl);
+        }, 'image/png');
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = function() {
+        alert('PNG 导出失败，请尝试 SVG 导出');
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
+
+    document.getElementById('export-svg').addEventListener('click', exportSVG);
+    document.getElementById('export-png').addEventListener('click', exportPNG);
+  </script>
+</body>
+</html>

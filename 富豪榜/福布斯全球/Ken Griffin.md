@@ -16,7 +16,7 @@ company: Citadel / Citadel Securities
 peak_rank: 22
 peak_net_worth: 43.4B USD（2024 Forbes 400）
 first_appeared: 2003
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[_主索引]]
   - [[George Soros]]

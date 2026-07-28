@@ -16,7 +16,7 @@ company: Red Bull GmbH（继承人）
 peak_rank: 30
 peak_net_worth: 434 亿美元（2025）
 first_appeared: 2023
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Phil Knight]]

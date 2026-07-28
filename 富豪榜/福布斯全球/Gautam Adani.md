@@ -15,7 +15,7 @@ company: Adani Group
 peak_rank: 3
 peak_net_worth: 150B USD
 first_appeared: 2010
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[_主索引]]
   - [[Mukesh Ambani]]

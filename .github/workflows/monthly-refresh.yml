@@ -1,0 +1,160 @@
+name: 月度内容刷新
+
+on:
+  schedule:
+    # 每月 1 日 UTC 09:00（即北京时间 17:00）
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '预览模式（不提交）'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    name: 自动刷新 MOC 索引和 quick_start
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: 重新生成 MOC 索引
+        run: |
+          echo "🔨 步骤 1: 重新生成 MOC 索引"
+          python tools/index_generator.py --all
+
+      - name: 重新生成 actionable 建议汇总
+        run: |
+          echo "⚡ 步骤 2: 重新生成 quick_start.md"
+          python tools/extract_actions.py
+
+      - name: 检查变更
+        id: check_changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "📝 检测到内容变更"
+            git status --short
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "✅ 无变更"
+          fi
+
+      - name: 提交变更
+        if: steps.check_changes.outputs.changes == 'true' && github.event_name != 'workflow_dispatch'
+        run: |
+          git config user.name "dana-bot"
+          git config user.email "bot@dana.local"
+          git add 索引/quick_start.md
+          # 提交索引变更
+          for f in 索引/*.md; do
+            git add "$f" 2>/dev/null || true
+          done
+          git commit -m "chore: 月度自动刷新 MOC 索引与 quick_start
+
+          - 由 .github/workflows/monthly-refresh.yml 自动生成
+          - 执行时间: $(date -u '+%Y-%m-%d %H:%M UTC')
+          - 变更范围: 索引/*.md, 索引/quick_start.md" || echo "No changes to commit"
+          git push
+
+      - name: 创建变更报告 PR
+        if: steps.check_changes.outputs.changes == 'true' && github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "dana-bot"
+          git config user.email "bot@dana.local"
+          git checkout -b monthly-refresh-${{ github.run_id }}
+          git add 索引/quick_start.md
+          for f in 索引/*.md; do
+            git add "$f" 2>/dev/null || true
+          done
+          git commit -m "chore: 月度自动刷新 MOC 索引与 quick_start"
+          git push origin monthly-refresh-${{ github.run_id }}
+          gh pr create \
+            --title "📊 月度自动刷新：MOC 索引 + quick_start" \
+            --body "由 .github/workflows/monthly-refresh.yml 自动生成。" \
+            --head "monthly-refresh-${{ github.run_id }}" \
+            --base master
+
+  freshness-update:
+    name: 自动更新陈旧内容 date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: 检查陈旧内容
+        run: |
+          echo "🕐 步骤 3: 检测陈旧内容"
+          python tools/audit.py --check-freshness
+
+      - name: 预览批量更新
+        run: |
+          echo "🔄 步骤 4: 预览批量更新（不实际执行）"
+          python tools/freshness_bump.py --dry-run
+
+      - name: 实际批量更新
+        run: |
+          echo "🔄 步骤 4: 批量更新 date"
+          python tools/freshness_bump.py --apply --days 180
+
+      - name: 检查变更
+        id: check_fresh_changes
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            git status --short
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 提交 date 更新
+        if: steps.check_fresh_changes.outputs.changes == 'true'
+        run: |
+          git config user.name "dana-bot"
+          git config user.email "bot@dana.local"
+          git add -A
+          git commit -m "chore: 批量更新陈旧内容 date 字段至 $(date -u '+%Y-%m-%d')
+
+          由 .github/workflows/monthly-refresh.yml 自动执行
+          阈值: 180 天
+          请 review 后合并" || echo "No changes to commit"
+          git push
+
+  report:
+    name: 月度状态报告
+    runs-on: ubuntu-latest
+    needs: [refresh, freshness-update]
+    if: always()
+    steps:
+      - name: 输出月度总结
+        run: |
+          echo "## 📊 dana 月度自动刷新报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- MOC 索引刷新: ${{ needs.refresh.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- date 字段更新: ${{ needs.freshness-update.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 触发方式: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 执行时间: $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY

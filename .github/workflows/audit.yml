@@ -1,19 +1,28 @@
-name: 知识库健康审计
+name: 知识库健康审计 + Jekyll 构建验证
 
 on:
   push:
     branches: [master]
     paths:
       - '**/*.md'
+      - 'docs/**'
+      - '.github/workflows/**'
+      - 'tools/**'
+      - 'requirements.txt'
   pull_request:
     branches: [master]
     paths:
       - '**/*.md'
+      - 'docs/**'
+      - '.github/workflows/**'
+      - 'tools/**'
+      - 'requirements.txt'
   schedule:
     - cron: '0 9 * * 1'
 
 jobs:
   audit:
+    name: Markdown 审计
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,4 +44,86 @@ jobs:
           echo "$output"
           if echo "$output" | grep -q "broken links"; then
             echo "::warning::发现 broken wikilinks，请检查审计输出"
+          fi
+
+  jekyll-build:
+    name: Jekyll Web 构建验证
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: false
+
+      - name: Install Jekyll
+        run: |
+          gem install jekyll --no-document
+          gem install jekyll-relative-links --no-document
+          gem install jekyll-theme-cayman --no-document
+
+      - name: Build site
+        run: |
+          jekyll build --destination /tmp/_site_test --trace --strict_front_matter
+          echo "✅ Jekyll 构建成功，生成页面数："
+          find /tmp/_site_test -name "*.html" | wc -l
+
+      - name: Verify key pages
+        run: |
+          for page in index.html search.html; do
+            if [ ! -f "/tmp/_site_test/$page" ]; then
+              echo "::error::关键页面缺失: $page"
+              exit 1
+            fi
+          done
+          echo "✅ 所有关键页面生成成功"
+
+      - name: Upload build artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jekyll-build-failure
+          path: /tmp/_site_test
+          retention-days: 3
+
+  freshness-monitor:
+    name: 内容新鲜度监控
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run freshness check
+        run: python tools/audit.py --check-freshness
+
+  audit-summary:
+    name: 审计总结
+    runs-on: ubuntu-latest
+    needs: [audit, jekyll-build, freshness-monitor]
+    if: always()
+    steps:
+      - name: 总结输出
+        run: |
+          if [ "${{ needs.audit.result }}" = "success" ] && \
+             [ "${{ needs.jekyll-build.result }}" = "success" ] && \
+             [ "${{ needs.freshness-monitor.result }}" = "success" ]; then
+            echo "✅ 全部检查通过"
+          else
+            echo "❌ 部分检查失败："
+            echo "  - Markdown 审计: ${{ needs.audit.result }}"
+            echo "  - Jekyll 构建: ${{ needs.jekyll-build.result }}"
+            echo "  - 新鲜度监控: ${{ needs.freshness-monitor.result }}"
+            exit 1
           fi

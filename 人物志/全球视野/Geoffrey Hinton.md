@@ -8,6 +8,7 @@ tags:
 aliases:
   - Geoffrey Hinton
   - Hinton
+summary_en: "Geoffrey Hinton is one of the 'Godfathers of Deep Learning' alongside Yann LeCun and Yoshua Bengio. His 2012 AlexNet (with Krizhevsky & Sutskever) ignited the modern AI revolution; his 2024 Nobel Prize in Physics (with Hopfield & Bengio) was the first Nobel ever awarded for AI research. After leaving Google in 2023, he became the most authoritative voice warning about AI existential risk. Key lesson: 40 years of pursuing an unpopular belief (neural nets) until the world caught up — and the moral courage to walk away when you believe your creation is dangerous."
 date: 2026-06-01
 related:
   - [[如何成为技术超级个体]]
@@ -20,6 +21,8 @@ related:
 ---
 
 # Geoffrey Hinton：深度学习教父，从奠基者到AI安全思考者
+
+> **English**: *Geoffrey Hinton — 'Godfather of Deep Learning'. 2012 AlexNet ignited the AI revolution; 2024 Nobel Prize honored the field. Left Google in 2023 to warn about AI existential risk. Core lesson: 40 years of patient belief + moral courage to question your own creation.*
 
 Geoffrey Hinton 是公认的"深度学习教父"之一，与 [[Yann LeCun]]、[[Yoshua Bengio]] 并称深度学习三巨头（Godfathers of Deep Learning）。
 

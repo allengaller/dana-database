@@ -16,7 +16,7 @@ company: Alphabet (Google)
 peak_rank: 6
 peak_net_worth: 144B USD
 first_appeared: 2004
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Larry Page]]

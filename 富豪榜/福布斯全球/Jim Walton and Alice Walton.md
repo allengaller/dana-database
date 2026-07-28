@@ -18,7 +18,7 @@ company: Walmart（继承人）/ Arvest Bank / Crystal Bridges Museum
 peak_rank: 12（Alice 单独）
 peak_net_worth: Alice ~1340 亿 / Jim ~1100 亿（2025 峰值）
 first_appeared: 1990s
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Sam Walton and Rob Walton]]

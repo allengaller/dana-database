@@ -18,7 +18,7 @@ company: Andreessen Horowitz (a16z)
 peak_rank: ~1800
 peak_net_worth: 15 亿美元（2025）
 first_appeared: 2020（Forbes 全球富豪榜）
-date: 2025-06-29
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Warren Buffett]]

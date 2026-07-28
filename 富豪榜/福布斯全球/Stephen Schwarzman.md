@@ -16,7 +16,7 @@ company: Blackstone（黑石集团）
 peak_rank: 31
 peak_net_worth: 44.4B USD（2025 Forbes 全球）
 first_appeared: 2007
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[_主索引]]
   - [[Warren Buffett]]

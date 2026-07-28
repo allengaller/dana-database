@@ -16,7 +16,7 @@ company: Microsoft（前 CEO）/ Los Angeles Clippers
 peak_rank: 6
 peak_net_worth: 1530 亿美元（2024 峰值）
 first_appeared: 2000
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Bill Gates]]

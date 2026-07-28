@@ -15,7 +15,7 @@ company: Google / Alphabet
 peak_rank: 2
 peak_net_worth: 2761 亿美元（2025 年 11 月 Forbes 实时）
 first_appeared: 2004（Google IPO 后）
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Sergey Brin]]

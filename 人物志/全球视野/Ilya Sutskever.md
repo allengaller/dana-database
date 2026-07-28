@@ -108,5 +108,91 @@ Sutskever 是 Scaling Law 最早的系统提出者和实践者之一（与 Kapla
 
 **本笔记基于公开论文、演讲与新闻报道提炼** ^ilya-note
 
-**相关人物**：[[Geoffrey Hinton]] · [[Demis Hassabis]] · [[Andrej Karpathy]] · [[Sam Altman]]
-**相关心法**：[[如何成为技术超级个体]] · [[T型深 + 梳型广]] · [[AI 对齐的工程实践]] · [[AI 时代的组织能力]]
+---
+
+## 早年与教育：俄罗斯移民的科学早慧
+
+Ilya Sutskever 1986 年出生于俄罗斯莫斯科，5 岁随家人移民以色列，后移居加拿大。他在多伦多大学跟随 **Geoffrey Hinton** 完成本科、硕士与博士研究，是深度学习"亲历启蒙一代"的核心成员之一。
+
+**关键时间线**：
+- 2003：进入多伦多大学，本科阶段即开始与 Hinton 合作研究
+- 2010：本科毕业前已在 Hinton 组做出重要研究（包括与 Alex Krizhevsky 合作 ImageNet 早期工作的延续）
+- 2011-2013：在 Hinton 指导下完成博士学业，研究方向为神经网络与无监督学习
+- 2013：加入刚成立的 Google Brain，与 Jeff Dean、Greg Corrado 等共事，开始研究"用深度学习解决序列建模问题"
+
+这段经历塑造了他后来两条核心信念：
+1. **Scaling 是有效的**（从在 Hinton 组、Google Brain 一路观察到的"模型越大效果越好"经验）
+2. **深度学习研究者应该关心 AI 的长期影响**（与 Hinton 一脉相承的"对 AI 安全的道德责任感"）
+
+---
+
+## 关键技术贡献（不只是 Transformer）
+
+### 1. AlexNet 之后的序列建模尝试（2013-2014，Google Brain）
+在 Google Brain 期间参与了将深度学习应用于语音识别、自然语言处理的早期工作。这些经验让他意识到 RNN/LSTM 的局限，为后来的 Transformer 思路埋下伏笔。
+
+### 2. **Transformer 架构共同发明者（2017）**
+与 Ashish Vaswani、Noam Shazeer、Niki Parmar、Jakob Uszkoreit、Llion Jones、Aidan Gomez、Łukasz Kaiser 等 8 人共同撰写《Attention is All You Need》。这是过去十年最重要的 AI 论文之一，奠定了所有现代 LLM（GPT、BERT、T5、PaLM、Claude、Llama）的架构基础。
+
+### 3. **Scaling Laws 系统研究（2020-2022）**
+与 Jared Kaplan 等合作的 Scaling Laws 论文（Kaplan et al., 2020；Hoffmann et al., 2022）确立了"模型大小、数据量、计算量应同步扩展"的核心结论，直接指导了 GPT-3、GPT-4 的研发路径。
+
+### 4. **OpenAI 的研究文化奠基**
+在 OpenAI 早期确立"研究 → 工程 → 产品"的高密度小团队文化，影响了 Dota 强化学习项目、GPT 系列研发、Codex、ChatGPT 的推进节奏。
+
+---
+
+## SSI（Safe Superintelligence Inc.）：2024 之后的赌注
+
+2024 年 5 月，Ilya 正式宣布离开 OpenAI，与前苹果 AI 负责人 Daniel Gross、OpenAI 前技术员 Daniel Levy 共同创办 **SSI**，明确提出三条非典型创业原则：
+
+| 原则 | 内容 | 对比 OpenAI 的反思 |
+|------|------|-------------------|
+| **单一目标** | 只做"安全超级智能"，不做其他产品 | OpenAI 同时承担研究、产品、API、ChatGPT 等多线任务 |
+| **拒绝短期融资压力** | 资金充裕后才对外融资，避免投资人对路线的影响 | OpenAI 与微软合作带来的商业化压力被指为治理冲突根源 |
+| **小团队高带宽** | 几十人顶尖团队，无产品/营销/销售部门 | 大厂组织必然带来的"安全 vs 速度"拉扯 |
+
+SSI 在 2024-2025 年累计融资超过 30 亿美元，估值约 320 亿美元，但几乎没有任何公开产品输出。这是有意为之的"耐心资本"模式。
+
+**对技术人的启示**：
+- 顶级研究者在"做大 vs 做对"之间确实存在硬选择
+- 当组织目标与个人信念冲突时，创办新机构是真实可行的选项
+- "单一目标 + 充足资金 + 极小团队"可能是研究驱动型 AI 公司的最优结构
+
+---
+
+## AI 治理反思：2023 董事会事件全解读
+
+2023 年 11 月 OpenAI 董事会突然罢免 Sam Altman，Ilya 是参与决策的核心成员之一（虽然最终在员工压力下转向支持 Altman 回归）。他对事件的公开反思包括：
+
+- **使命与控制权的张力是真实存在的**：即使董事会以"使命对齐"为初衷，决策过程仍可能被信息不对称、信任破裂所扭曲
+- **"非营利母公司 + 营利子公司"的双轨结构**：在 GPT-4/ChatGPT 商业化后变得难以维持
+- **AI 公司的治理需要新的设计**：传统公司治理（董事会投票、股权稀释）不足以应对"AGI 可能影响人类长期未来"这种特殊责任
+
+Ilya 在 2024 年多次公开演讲中提到：**"AI 公司的治理是 21 世纪最重要的未解决问题之一"**。这是他选择 SSI 这种新结构的核心理由。
+
+---
+
+## 局限与代价
+
+任何深度研究 Ilya 路径的人，也需要看到代价与权衡：
+
+1. **极少公开个人生活**：与 Musk、Zuckerberg 等"社交媒体型创始人"形成鲜明对比，几乎不发 Twitter，几乎不接受播客采访。这种克制本身就是一种选择，但也意味着公众影响力有限。
+2. **SSI 模式的可持续性存疑**：不融资、不出产品、不对外宣传的研究型 AI 公司，能否长期维持顶尖人才？前 SSI 研究员已陆续离开（如一些去了 Meta Superintelligence Labs）。
+3. **对 AI 风险的具体判断仍待验证**：Ilya 公开预测的"10 年内可能出现超级智能"是否符合现实，需要时间检验。如果时间表过早，SSI 的专注反而可能错失机会窗口。
+4. **从研究者到治理参与者的转型代价**：参与 2023 董事会事件让他在 OpenAI 内部"信任受损"，最终选择离开。任何想成为"研究 + 治理双重角色"的人都需要权衡这一代价。
+
+---
+
+## 推荐阅读 / 论文清单
+
+- **Kaplan et al., 2020**：《Scaling Laws for Neural Language Models》—— Scaling 哲学奠基
+- **Vaswani et al., 2017**：《Attention is All You Need》—— Transformer 架构
+- **Hoffmann et al., 2022**：《Training Compute-Optimal Large Language Models》（Chinchilla 论文）—— 计算最优的 Scaling
+- **Sutskever 2023 NeurIPS 演讲**：关于"对 AI 长期影响的认真思考"
+- **SSI 官方使命声明**：https://ssi.inc
+
+---
+
+**相关人物**：[[Geoffrey Hinton]] · [[Demis Hassabis]] · [[Andrej Karpathy]] · [[Sam Altman]] · [[Dario Amodei]]
+**相关心法**：[[如何成为技术超级个体]] · [[T型深 + 梳型广]] · [[AI 对齐的工程实践]] · [[AI 时代的组织能力]] · [[Scaling Law 的哲学]]

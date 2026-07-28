@@ -16,7 +16,7 @@ company: Susquehanna International Group（SIG）
 peak_rank: 20
 peak_net_worth: 660 亿美元（2025 峰值）
 first_appeared: 2010s
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Thomas Peterffy]]

@@ -2,6 +2,8 @@
 
 > **研究大拿 · 成为大拿**
 
+> **English Summary**: *dana (大拿, "the great one") is an open knowledge platform studying how legendary engineers and AI researchers grow — and how ordinary developers can systematically become better through research-backed, reproducible methods. We curate deep profiles of 88+ tech masters (李运华, Jeff Dean, Ilya Sutskever, Jensen Huang, etc.), 75+ billionaire mental models (Musk, Arnault, Ma Yun, Zhang Yiming), 21 proven principles (deliberate practice, leverage thinking, second-brain for engineers), and growth paths across 0-12+ years. Built as an Obsidian vault + Jekyll site, with AI-era focus, automated audit tooling, and a "study a great one, then become one" philosophy.*
+
 **dana** 是一个**严肃的开源知识平台**，致力于系统研究技术大拿的成长路径、心法与决策，并帮助有志者通过可复制的方式成为更好的自己。
 
 我们相信：**大拿不是天生的，而是长期主义 + 正确方法 + 批判性学习 + 持续输出的结果。**
@@ -198,6 +200,10 @@ dana 试图用**研究方法论 + 系统路径 + 高质量人物复盘**，给�
 - **暂不接受**：纯技术教程（已有大量优秀仓库）、鸡汤软文、未经深度思考的笔记
 
 **提交前请先阅读现有笔记，理解质量标准。详细贡献流程请参考 [CONTRIBUTING.md](CONTRIBUTING.md)。**
+
+### 贡献者墙
+
+所有被合并的贡献都会记录在 [CONTRIBUTORS.md](CONTRIBUTORS.md)，按贡献类型分级致谢。如果你已经提交过 PR 并希望被列出，欢迎提 Issue 告知。
 
 ---
 

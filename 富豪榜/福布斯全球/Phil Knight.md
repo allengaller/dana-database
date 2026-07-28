@@ -18,7 +18,7 @@ company: Nike
 peak_rank: 13
 peak_net_worth: 520 亿美元（2022 峰值）
 first_appeared: 1980s
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Bernard Arnault]]

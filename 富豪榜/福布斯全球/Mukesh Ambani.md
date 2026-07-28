@@ -15,7 +15,7 @@ company: Reliance Industries
 peak_rank: 4
 peak_net_worth: 92.5B USD
 first_appeared: 2008
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[_主索引]]
   - [[Bernard Arnault]]

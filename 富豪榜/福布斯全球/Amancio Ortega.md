@@ -15,7 +15,7 @@ company: Inditex（Zara 母公司）
 peak_rank: 1
 peak_net_worth: 124B USD
 first_appeared: 2001
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Bernard Arnault]]

@@ -17,7 +17,7 @@ company: Amazon
 peak_rank: 1
 peak_net_worth: 227B USD
 first_appeared: 1999
-date: 2025-01-01
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Bill Gates]]

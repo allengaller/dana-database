@@ -16,7 +16,7 @@ company: OP Jindal Group
 peak_rank: 30
 peak_net_worth: 378 亿美元（2025 峰值）
 first_appeared: 2010s
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Mukesh Ambani]]

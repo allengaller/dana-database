@@ -7,6 +7,8 @@ date: 2026-06-01
 
 # dana 项目路线图（2026-2027）
 
+> **English Summary**: dana's roadmap to becoming the most systematic, trustworthy open-source knowledge platform for "studying tech masters + becoming one" in the Chinese tech community. Phase 1 (2026 Q2-Q3): complete content & structure — 40+ master profiles, AI-era column, methodology, growth paths. Phase 2 (2026 Q3-Q4): launch & community — GitHub Pages, Notion templates, study groups. Phase 3 (2027+): ecosystem — contributor community, certified researcher program, companion tools (master-card generator, path self-assessment, enhanced Canvas interaction).
+
 > **目标**：把 dana 打造成中文技术圈最系统、最可信的“研究大拿 + 成为大拿”开源知识平台。
 
 ---

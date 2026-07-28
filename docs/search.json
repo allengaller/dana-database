@@ -1,16 +1,39 @@
 ---
 layout: null
 ---
+{% assign sections_map = '
+  ' %}
+{% assign people_section = '人物志' %}
+{% assign wealth_section = '富豪榜' %}
+{% assign principles_section = '心法与原则' %}
+{% assign path_section = '成长路径' %}
+{% assign method_section = '方法论与框架' %}
+{% assign case_section = '案例研究' %}
+{% assign resource_section = '资源库' %}
 [
 {% assign first = true %}
 {% for file in site.pages %}
   {% if file.name != 'search.json' and file.name != 'search.html' and file.ext == '.md' %}
   {% unless first %},{% endunless %}
   {% assign first = false %}
+
+  {% assign section = '' %}
+  {% if file.path contains '/人物志/' %}{% assign section = '人物志' %}
+  {% elsif file.path contains '/富豪榜/' %}{% assign section = '富豪榜' %}
+  {% elsif file.path contains '/心法与原则/' %}{% assign section = '心法与原则' %}
+  {% elsif file.path contains '/成长路径/' %}{% assign section = '成长路径' %}
+  {% elsif file.path contains '/方法论与框架/' %}{% assign section = '方法论与框架' %}
+  {% elsif file.path contains '/案例研究/' %}{% assign section = '案例研究' %}
+  {% elsif file.path contains '/资源库/' %}{% assign section = '资源库' %}
+  {% endif %}
+
   {
     "title": {{ file.title | default: file.name | jsonify }},
     "url": {{ file.url | jsonify }},
-    "content": {{ file.content | strip_html | strip_newlines | normalize_whitespace | jsonify }}
+    "section": {{ section | jsonify }},
+    "date": {% if file.date %}"{{ file.date | date: '%Y-%m-%d' }}"{% else %}""{% endif %},
+    "tags": {% if file.tags %}{{ file.tags | jsonify }}{% else %}[]{% endif %},
+    "content": {{ file.content | strip_html | strip_newlines | normalize_whitespace | truncate: 8000 | jsonify }}
   }
   {% endif %}
 {% endfor %}

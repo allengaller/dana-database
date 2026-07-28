@@ -17,7 +17,7 @@ company: Interactive Brokers
 peak_rank: 18
 peak_net_worth: 800 亿美元（2025 峰值）
 first_appeared: 2000s
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Jeff Yass]]

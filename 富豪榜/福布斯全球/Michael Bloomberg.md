@@ -16,7 +16,7 @@ company: Bloomberg LP
 peak_rank: 8
 peak_net_worth: 1060 亿美元（2024 峰值）
 first_appeared: 1990s
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Bill Gates]]

@@ -8,80 +8,369 @@ title: 搜索
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>dana · 搜索</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lunr@2.3.9/lunr.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem 1rem; color: #333; background: #fafafa; }
-    h1 { font-size: 1.5rem; margin-bottom: 1rem; }
-    h1 a { color: #666; text-decoration: none; }
-    h1 a:hover { color: #333; }
-    #search-input { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 2px solid #ddd; border-radius: 8px; outline: none; transition: border-color 0.2s; }
-    #search-input:focus { border-color: #4a90d9; }
+    :root {
+      --bg: #fafafa;
+      --card-bg: #fff;
+      --text: #2c3e50;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #2c5282;
+      --primary-bg: #e8f0fe;
+      --highlight: #fef3c7;
+      --tag-人物志: #dbeafe;
+      --tag-富豪榜: #fef3c7;
+      --tag-心法与原则: #d1fae5;
+      --tag-成长路径: #fce7f3;
+      --tag-方法论与框架: #e9d5ff;
+      --tag-案例研究: #fed7aa;
+      --tag-资源库: #ccfbf1;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --card-bg: #1e293b;
+        --text: #e2e8f0;
+        --text-muted: #94a3b8;
+        --border: #334155;
+        --primary: #60a5fa;
+        --primary-bg: #1e3a8a;
+        --highlight: #78350f;
+      }
+    }
+    body {
+      font-family: "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    h1 a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+    h1 a:hover { color: var(--text); }
+    .search-stats {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    #search-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      background: var(--card-bg);
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    #search-input:focus { border-color: var(--primary); }
     #results { margin-top: 1.5rem; }
-    .result { padding: 1rem; margin-bottom: 0.75rem; background: #fff; border-radius: 8px; border: 1px solid #eee; }
-    .result h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
-    .result h3 a { color: #2c5282; text-decoration: none; }
+    .result {
+      padding: 1.25rem;
+      margin-bottom: 0.85rem;
+      background: var(--card-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .result:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .result h3 { font-size: 1.05rem; margin-bottom: 0.35rem; font-weight: 600; }
+    .result h3 a { color: var(--primary); text-decoration: none; }
     .result h3 a:hover { text-decoration: underline; }
-    .result p { font-size: 0.9rem; color: #666; line-height: 1.5; }
-    .empty { color: #999; text-align: center; padding: 2rem; }
-    .badge { display: inline-block; background: #e8f0fe; color: #2c5282; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 4px; margin-bottom: 0.5rem; }
+    .result-meta {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.18rem 0.55rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .badge-人物志 { background: var(--tag-人物志); color: #1e40af; }
+    .badge-富豪榜 { background: var(--tag-富豪榜); color: #92400e; }
+    .badge-心法与原则 { background: var(--tag-心法与原则); color: #065f46; }
+    .badge-成长路径 { background: var(--tag-成长路径); color: #9d174d; }
+    .badge-方法论与框架 { background: var(--tag-方法论与框架); color: #6b21a8; }
+    .badge-案例研究 { background: var(--tag-案例研究); color: #9a3412; }
+    .badge-资源库 { background: var(--tag-资源库); color: #115e59; }
+    .result-date {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .result p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-top: 0.35rem;
+    }
+    mark {
+      background: var(--highlight);
+      color: inherit;
+      padding: 0 0.15em;
+      border-radius: 2px;
+    }
+    .empty {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .empty-hint {
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-size: 0.78rem;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--card-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--primary); color: var(--text); }
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
   </style>
 </head>
 <body>
-  <h1><a href="{{ '/' | relative_url }}">&larr; dana</a> &middot; 全文搜索</h1>
-  <input type="text" id="search-input" placeholder="输入关键词搜索所有页面..." autofocus>
+  <div class="header">
+    <h1><a href="{{ '/' | relative_url }}">&larr; dana</a> · 全文搜索</h1>
+    <div class="search-stats" id="search-stats"></div>
+  </div>
+
+  <input type="text" id="search-input" placeholder="输入关键词搜索（如：刻意练习 / Musk / 影响力）..." autofocus>
+
+  <div class="filters" id="filters"></div>
+
   <div id="results"><p class="empty">输入关键词开始搜索</p></div>
 
   <script>
-    let data = [];
+    let pages = [];
+    let idx = null;
+    let activeSection = 'all';
+
     const input = document.getElementById('search-input');
     const resultsDiv = document.getElementById('results');
+    const filtersDiv = document.getElementById('filters');
+    const statsDiv = document.getElementById('search-stats');
+
+    // 中文友好的分词：单字符 + 双字符 + 字符串
+    function tokenize(text) {
+      const tokens = new Set();
+      if (!text) return [];
+      // 完整短语
+      tokens.add(text.toLowerCase());
+      // 双字符滑动窗口
+      for (let i = 0; i < text.length - 1; i++) {
+        tokens.add(text.substring(i, i + 2).toLowerCase());
+      }
+      // 单字符
+      for (const ch of text) {
+        tokens.add(ch.toLowerCase());
+      }
+      // 英文单词
+      const en = text.match(/[a-zA-Z]+/g);
+      if (en) en.forEach(w => tokens.add(w.toLowerCase()));
+      return Array.from(tokens);
+    }
 
     fetch('{{ "/search.json" | relative_url }}')
       .then(r => r.json())
-      .then(d => { data = d; })
-      .catch(() => { resultsDiv.innerHTML = '<p class="empty">索引加载失败</p>'; });
+      .then(data => {
+        pages = data;
+        // 构造 Lunr 索引
+        idx = lunr(function() {
+          this.ref('id');
+          this.field('title', { boost: 10 });
+          this.field('section', { boost: 5 });
+          this.field('tags', { boost: 3 });
+          this.field('content');
+
+          data.forEach((p, i) => {
+            this.add({
+              id: i,
+              title: p.title || '',
+              section: p.section || '',
+              tags: (p.tags || []).join(' '),
+              content: (p.content || '').substring(0, 5000)
+            });
+          });
+        });
+
+        statsDiv.textContent = `📚 ${data.length} 篇已索引`;
+        // 渲染过滤按钮
+        const sections = Array.from(new Set(data.map(p => p.section).filter(Boolean))).sort();
+        sections.forEach(s => {
+          const btn = document.createElement('button');
+          btn.className = 'filter-btn';
+          btn.dataset.section = s;
+          btn.textContent = s;
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeSection = s;
+            search(input.value.trim());
+          });
+          filtersDiv.appendChild(btn);
+        });
+
+        // 初始：URL 参数搜索
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get('q');
+        if (q) { input.value = q; search(q); }
+      })
+      .catch(err => {
+        resultsDiv.innerHTML = '<p class="empty">⚠️ 索引加载失败：' + err.message + '</p>';
+      });
+
+    function highlight(text, terms) {
+      if (!text) return '';
+      let out = text;
+      terms.forEach(t => {
+        if (!t || t.length < 1) return;
+        const re = new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+        out = out.replace(re, '<mark>$1</mark>');
+      });
+      return out;
+    }
+
+    function makeSnippet(content, terms) {
+      if (!content) return '';
+      // 找到第一个匹配的位置
+      let firstIdx = -1;
+      for (const t of terms) {
+        const idx = content.toLowerCase().indexOf(t.toLowerCase());
+        if (idx > -1 && (firstIdx === -1 || idx < firstIdx)) {
+          firstIdx = idx;
+          break;
+        }
+      }
+      if (firstIdx === -1) {
+        return content.substring(0, 160) + (content.length > 160 ? '...' : '');
+      }
+      const start = Math.max(0, firstIdx - 50);
+      const end = Math.min(content.length, firstIdx + 120);
+      const snippet = content.substring(start, end);
+      return (start > 0 ? '...' : '') + snippet + (end < content.length ? '...' : '');
+    }
 
     function search(query) {
       if (!query || query.length < 1) {
         resultsDiv.innerHTML = '<p class="empty">输入关键词开始搜索</p>';
         return;
       }
-      const terms = query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
-      const matches = data.filter(page => {
-        const text = (page.title + ' ' + page.content).toLowerCase();
-        return terms.every(t => text.includes(t));
-      }).slice(0, 20);
 
-      if (matches.length === 0) {
-        resultsDiv.innerHTML = '<p class="empty">未找到匹配结果</p>';
+      if (!idx) {
+        resultsDiv.innerHTML = '<p class="loading"><span class="spinner"></span> 索引加载中…</p>';
         return;
       }
 
-      resultsDiv.innerHTML = matches.map(page => {
-        let snippet = page.content;
-        for (const t of terms) {
-          const idx = snippet.toLowerCase().indexOf(t);
-          if (idx > -1) {
-            const start = Math.max(0, idx - 40);
-            const end = Math.min(snippet.length, idx + t.length + 80);
-            snippet = (start > 0 ? '...' : '') + snippet.slice(start, end) + (end < page.content.length ? '...' : '');
-            break;
-          }
-        }
-        if (snippet.length > 160) snippet = snippet.slice(0, 160) + '...';
-        return '<div class="result"><h3><a href="' + page.url + '">' + page.title + '</a></h3><p>' + snippet + '</p></div>';
+      const terms = tokenize(query);
+      let results = [];
+
+      try {
+        // 用 * 通配符 + 完整短语
+        const expandedQuery = terms.slice(0, 5).map(t => t + '*').join(' ') + ' ' + query + '^10';
+        results = idx.search(expandedQuery);
+      } catch (e) {
+        // 退化：仅用整词搜索
+        results = idx.search(query);
+      }
+
+      // 应用板块过滤
+      let filtered = results.map(r => {
+        const page = pages[r.ref];
+        return { ...page, score: r.score };
+      });
+      if (activeSection !== 'all') {
+        filtered = filtered.filter(p => p.section === activeSection);
+      }
+
+      // 取前 30 个
+      filtered = filtered.slice(0, 30);
+
+      if (filtered.length === 0) {
+        resultsDiv.innerHTML = `<p class="empty">未找到匹配结果<p class="empty-hint">试试更短的关键词、检查拼写、或切换板块</p></p>`;
+        return;
+      }
+
+      resultsDiv.innerHTML = filtered.map(page => {
+        const section = page.section || '';
+        const sectionBadge = section ? `<span class="badge badge-${section}">${section}</span>` : '';
+        const dateStr = page.date ? `<span class="result-date">${String(page.date).substring(0, 10)}</span>` : '';
+        const snippet = makeSnippet(page.content || '', [query, ...terms.slice(0, 3)]);
+        const title = highlight(page.title || page.url, [query]);
+        return `<div class="result">
+          <div class="result-meta">
+            ${sectionBadge}
+            ${dateStr}
+          </div>
+          <h3><a href="${page.url}">${title}</a></h3>
+          <p>${snippet}</p>
+        </div>`;
       }).join('');
+
+      statsDiv.textContent = `🔍 ${filtered.length} 个结果`;
     }
 
     let timer;
     input.addEventListener('input', () => {
       clearTimeout(timer);
-      timer = setTimeout(() => search(input.value.trim()), 200);
+      timer = setTimeout(() => search(input.value.trim()), 180);
     });
-
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get('q');
-    if (q) { input.value = q; search(q); }
   </script>
 </body>
 </html>

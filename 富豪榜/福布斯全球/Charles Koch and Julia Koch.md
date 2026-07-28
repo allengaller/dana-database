@@ -18,7 +18,7 @@ company: Koch Industries
 peak_rank: 4
 peak_net_worth: Charles ~750 亿 / Julia ~750 亿（2024 峰值）
 first_appeared: 1990s
-date: 2025-07-10
+date: 2026-07-26
 related:
   - [[富豪榜主索引]]
   - [[Warren Buffett]]

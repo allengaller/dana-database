@@ -1,0 +1,98 @@
+name: GitHub Pages 部署
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/pages-deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: 构建 Jekyll 站点
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: false
+
+      - name: 安装 Jekyll
+        run: |
+          gem install jekyll --no-document
+          gem install jekyll-relative-links --no-document
+          gem install jekyll-theme-cayman --no-document
+
+      - name: 构建
+        run: |
+          jekyll build --baseurl "" --trace
+          echo "✅ 构建完成，生成页面："
+          find _site -name "*.html" | wc -l
+
+      - name: 上传构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_site
+
+  deploy:
+    name: 部署到 GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: 部署后验证
+        run: |
+          echo "🚀 已部署到：${{ steps.deployment.outputs.page_url }}"
+          echo "部署 ID: ${{ steps.deployment.outputs.deployment_id }}"
+
+  health-check:
+    name: 部署后健康检查
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 验证关键页面
+        run: |
+          BASE_URL="${{ needs.deploy.outputs.page_url }}"
+          for page in "" "skill_map.html" "search.html"; do
+            url="$BASE_URL/$page"
+            status=$(curl -s -o /dev/null -w "%{http_code}" "$url" || echo "000")
+            if [[ "$status" == "200" ]]; then
+              echo "✅ $url ($status)"
+            else
+              echo "⚠️ $url ($status)"
+            fi
+          done
+
+      - name: 检查搜索索引
+        run: |
+          BASE_URL="${{ needs.deploy.outputs.page_url }}"
+          # 验证 search.json 包含必要字段
+          curl -s "$BASE_URL/search.json" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          print(f'索引页面数: {len(data)}')
+          print(f'含 section 字段: {sum(1 for p in data if p.get(\"section\"))}')
+          print(f'含 tags 字段: {sum(1 for p in data if p.get(\"tags\"))}')
+          "
