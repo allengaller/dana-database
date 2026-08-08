@@ -73,6 +73,19 @@ AI 时代与其他技术浪潮不同：
 - [[李开复]] — AI 在中国落地与投资的先行者
 - [[朱松纯]] — 认知建模与具身智能推动者，北京通用人工智能研究院院长
 
+### LLM 推理基础设施（2026 新增，UC Berkeley Sky Lab 群组）
+> AI 时代的"水电煤"层——为 Meta、Google、DeepSeek、阿里、月之暗面等所有大模型公司提供推理引擎的核心架构师。
+- [[Ion Stoica]] — UC Berkeley Sky Lab 教父，Spark/Ray/vLLM/SGLang 共同导师，AI 时代分布式系统之神
+- [[Woosuk Kwon]] — vLLM 原始作者，PagedAttention 一作（SOSP 2023），把"显存虚拟内存"带进 LLM 推理
+- [[Simon Mo]] — vLLM 创始维护者，Inferact CEO，$150M 种子轮（a16z + Lightspeed 领投）
+- [[Lianmin Zheng]] — SGLang 创始人，RadixAttention 发明者，DeepSeek 官方推荐推理引擎
+- [[游凯超]] — 清华特奖，vLLM 核心贡献者，Inferact 联合创始人（"中文学术 + 美国开源"双血统代表）
+
+### AI 开源生态与机器人学习（2026-08 新增）
+> 把"AI 民主化"和"机器人学习"做成可被复制的开源生态基础设施。
+- [[Clément Delangue]] — Hugging Face 联合创始人兼 CEO，把"GitHub for ML"做成估值 45 亿美元的开源帝国；AI 时代中立 + 开放 + 长期主义护城河
+- [[Pieter Abbeel]] — UC Berkeley 机器人学习教父，深度强化学习先驱，2021 ACM Prize 获奖者；Covariant / Gradescope 联合创始人；桃李满天下（John Schulman / Sergey Levine / Chelsea Finn 学派源）
+
 ---
 
 ## AI 时代大拿类型对比
@@ -82,7 +95,9 @@ AI 时代与其他技术浪潮不同：
 | 研究奠基型     | Hinton, LeCun, Sutton    | 长期坚持 + 范式提出           | 学术 → 工业研究 → 思想输出   | 哲学洞见 + 历史教训         |
 | 教育与传播型   | Andrew Ng, Karpathy      | 结构化教学 + 工程实践         | 研究 → 教育内容 → 产业       | 如何把复杂知识可教学化      |
 | 研究+产品型    | Hassabis, Sutskever      | 研究闭环 + 产品落地           | 研究机构 → 初创公司          | Scaling + 对齐              |
-| 基础设施型     | Jensen Huang             | 硬件+软件生态长期布局         | 公司创始人                   | 平台思维 + 长期主义         |
+| 基础设施型     | Jensen Huang、Stoica      | 硬件+软件生态长期布局         | 公司创始人 / 学术-产业双栖   | 平台思维 + 长期主义         |
+| LLM 推理引擎  | Woosuk Kwon、Simon Mo、Lianmin Zheng | 论文 + 工程 + 社区三位一体     | 顶级博士 → 顶级开源 maintainer → 顶级资本 | 范式级算法 + 工业级维护 + 反共识判断 |
+| 跨文化复合型  | 游凯超                  | 中文学术 + 美国开源 + 创业    | 清华特奖 → 国际开源核心贡献者 → 1.5 亿美元公司联创 | 双语护城河 + ML × Systems 跨界勇气 |
 | 社会影响型     | Fei-Fei Li               | 技术 + 伦理 + 教育            | 学术 → 社会组织              | AI for Good                 |
 | 中国实践型     | 李开复                   | 全球视野 + 本地落地           | 大厂高管 → 投资+内容         | 产业应用 + 职业建议         |
 
